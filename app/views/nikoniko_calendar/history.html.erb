@@ -1,0 +1,121 @@
+<%
+# Niko-niko Calendar plugin for Redmine 2.X
+# Copyright (C) 2013 piccagliani
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%>
+<p>
+<%
+prev_label = "« " + @prev_month.year.to_s + "-" + @prev_month.month.to_s
+next_label = @next_month.year.to_s + "-" + @next_month.month.to_s + " »"
+%>
+<%= link_to prev_label, nikoniko_calendar_history_path(:year => @prev_month.year, :month => @prev_month.month), {:class => "nikoniko_history_pager"} %>
+<% if @next_month < @today  %>
+|
+<%= link_to next_label, nikoniko_calendar_history_path(:year => @next_month.year, :month => @next_month.month), {:class => "nikoniko_history_pager"} %>
+<% end %>
+</p>
+
+<div class="splitcontentleft">
+<table class="cal nikoniko_calendar">
+<thead>
+<tr><th class="week-number" colspan="8"><span id="CurrentMonth"><%= @target_month.year.to_s + "-" + @target_month.month.to_s %></span></th></tr>
+<tr><th scope="col" title="<%= l(:label_week) %>" class="week-number"></th><% 7.times do |i| %><th scope="col"><%= day_name( (@calendar.first_wday+i)%7 ) %></th><% end %></tr>
+</thead>
+<tbody>
+<tr>
+<% 
+day = @calendar.startdt
+while day <= @calendar.enddt
+%>
+<%= ("<td class='week-number' title='#{ l(:label_week) }'>#{(day+(11-day.cwday)%7).cweek}</td>".html_safe) if day.cwday == @calendar.first_wday %>
+<td class="<%= day.month==@calendar.month ? 'even' : 'odd' %><%= ' today' if Date.today == day %>">
+<p class="day-num"><%= day.day %></p>
+<div class="tooltip">
+<% if (history = @nikoniko_history[day.to_s]) != nil %>
+<% history.niko = "0" if history.niko == "" %>
+<a class="nikoniko_history" href="#<%= day.to_s %>"><%= image_tag "nikoniko_" + history.niko + ".png", :class => "niko", :width => "64", :height => "64", :plugin => "redmine_nikoniko_calendar2" %></a>
+<span class="tip">
+<% if 0 < history.comment.length %>
+<%= h history.comment %>
+<% else %>
+(<%= l(:nikoniko_feel_no_comment)%>)
+                        <% end %>
+</span>
+<% elsif day <= @today %>
+<a class="nikoniko_history" href="#<%= day.to_s %>"><%= image_tag "nikoniko_0.png", :class => "niko", :width => "64", :height => "64", :plugin => "redmine_nikoniko_calendar2" %></a>
+<span class="tip niko0"><%= l(:nikoniko_feel_nil) %></span>
+<% end %>
+</div>
+</td>
+<%= '</tr><tr>'.html_safe if day.cwday==@calendar.last_wday and day!=@calendar.enddt %>
+<% 
+day = day + 1
+end
+%>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="splitcontentright">
+    <div id="NikonikoAverageContainer">
+        <h4><%= l(:nikoniko_score) %></h4>
+        <div class="splitcontentleft">
+            <canvas id="NikonikoAverage"></canvas>
+            <script type="text/javascript">
+            app.nikonikoAverage = <%= @nikoniko_average %>; 
+            </script>
+        </div>
+        <div class="splitcontentright">
+            <span class="big"><%= @nikoniko_average %></span><%= l(:nikoniko_score_unit) %>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    <div id="NikonikoSummaryContainer">
+        <h4><%= l(:nikoniko_summary) %></h4>
+        <div class="splitcontentleft">
+            <div id="NikonikoSummary"></div>
+            <script type="text/javascript">
+            app.nikonikoSummary = [[
+                ['<%= l(:nikoniko_feel_good) %>',<%= @nikoniko_summary["3"] %>],
+                ['<%= l(:nikoniko_feel_ordinary) %>',<%= @nikoniko_summary["2"] %>],
+                ['<%= l(:nikoniko_feel_bad) %>',<%= @nikoniko_summary["1"] %>],
+                ['<%= l(:nikoniko_feel_nil) %>',<%= @nikoniko_summary["0"] %>]
+            ]];
+            </script>
+        </div>
+        <div class="splitcontentright">
+            <table class="list">
+                <tr class="odd">
+                    <td width="20%"><%= image_tag("nikoniko_3.png", :plugin => 'redmine_nikoniko_calendar2', :width => "32", :height => "32", :alt => l(:nikoniko_feel_good)) %></td>
+                    <td width="auto"><%= @nikoniko_summary["3"] %> <%= l(:label_day_plural) %></td>
+                </tr>
+                <tr class="even">
+                    <td><%= image_tag("nikoniko_2.png", :plugin => 'redmine_nikoniko_calendar2', :width => "32", :height => "32", :alt => l(:nikoniko_feel_ordinary)) %></td>
+                    <td><%= @nikoniko_summary["2"] %> <%= l(:label_day_plural) %></td>
+                </tr>
+                <tr class="odd">
+                    <td><%= image_tag("nikoniko_1.png", :plugin => 'redmine_nikoniko_calendar2', :width => "32", :height => "32", :alt => l(:nikoniko_feel_bad)) %></td>
+                    <td><%= @nikoniko_summary["1"] %> <%= l(:label_day_plural) %></td>
+                </tr>
+                <tr class="even">
+                    <td><%= image_tag("nikoniko_0.png", :plugin => 'redmine_nikoniko_calendar2', :width => "32", :height => "32", :alt => l(:nikoniko_feel_nil)) %></td>
+                    <td><%= @nikoniko_summary["0"] %> <%= l(:label_day_plural) %></td>
+                </tr>
+            </table>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+</div>

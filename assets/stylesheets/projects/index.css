@@ -1,0 +1,65 @@
+table.cal {
+    margin-bottom: 0;
+}
+
+table.cal tbody tr {
+    height: auto;
+}
+
+table.cal thead th, table.cal tbody td {
+    text-align: center;
+    width: 40px;
+    padding: 0;
+}
+
+.fixedTable {
+    margin-top: 1px;
+}
+
+.fixedHead table, .fixedTable table {
+    border-collapse: collapse;
+}
+
+.fixedHead td, .fixedTable td {
+    padding: 0;
+    border: 1px solid #d7d7d7;
+    vertical-align: middle;
+}
+
+.fixedHead td {
+    text-align: center;
+    width: 40px;
+    background-color: #EEEEEE;
+}
+
+.fixedHead td.member {
+    border: 1px solid transparent;
+    background-color: transparent;
+}
+.fixedTable td.member {
+    padding-left: 2px;
+}
+
+.fixedTable td a {
+    cursor: default;
+}
+
+.fixedTable td.member a {
+    cursor: pointer;
+}
+
+#sidebar label {
+    display: block;
+}
+
+td.Sat, div.Sat {
+    background-color: #F0F8FF;
+}
+
+td.Sun, div.Sun {
+    background-color: #FFF0F5;
+}
+
+div.tooltip:hover span.tip {
+    width: 15em;
+}

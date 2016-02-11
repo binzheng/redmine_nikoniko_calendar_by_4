@@ -1,0 +1,86 @@
+<%
+# Niko-niko Calendar plugin for Redmine 2.X
+# Copyright (C) 2013 piccagliani
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%>
+<p>
+<%
+prev_label = "« " + @prev_month.year.to_s + "-" + @prev_month.month.to_s
+next_label = @next_month.year.to_s + "-" + @next_month.month.to_s + " »"
+%>
+<%= link_to prev_label, nikoniko_calendar_project_history_path(:year => @prev_month.year, :month => @prev_month.month), {:class => "nikoniko_history_pager"} %>
+<% if @next_month < @today  %>
+|
+<%= link_to next_label, nikoniko_calendar_project_history_path(:year => @next_month.year, :month => @next_month.month), {:class => "nikoniko_history_pager"} %>
+<% end %>
+</p>
+
+<table class="cal nikoniko_calendar">
+    <thead>
+        <tr>
+            <th class="member"><%= @target_month.year %>-<%= @target_month.month %><br />&nbsp;</th>
+            <%
+            day = @calendar.startdt
+            while day <= @calendar.enddt
+            %>
+                <% if day.beginning_of_month == @target_month %>
+            <th><div class="<%= day.strftime("%a") %>"><%= day.day %><br /><%= day_letter(day.cwday) %></div></th>
+                <% end %>
+            <%
+            day = day + 1 
+            end
+            %>
+        </tr>
+    </thead>
+    <tbody>
+        <% @members.each_with_index do |member, index| %>
+        <tr class="<%= index %>">
+            <td class="member <%= index % 2 == 0 ? "odd" : "even" %>"><%= link_to member, user_path(:id => member.id) %></td>
+            <% 
+            day = @calendar.startdt
+            while day <= @calendar.enddt
+            %>
+                <% if day.beginning_of_month == @target_month %>
+            <td class="<%= day.strftime("%a") %> <%= index % 2 == 0 ? "odd" : "even" %>">
+                    <% if day <= @today %>
+                <div class="tooltip">
+                        <% if @nikoniko_histories[member.id] == nil or (history = @nikoniko_histories[member.id][day.to_s]) == nil%>
+                    <%= image_tag "nikoniko_0.png", :class => "niko", :width => "36", :height => "36", :plugin => "redmine_nikoniko_calendar2" %>
+                    <span class="tip"><%= l(:nikoniko_feel_nil) %></span>
+                        <% else %>
+                        <% history.niko = "0" if history.niko == "" %>
+                    <a href="javascript:void(0);"><%= image_tag "nikoniko_" + history.niko + ".png", :class => "niko", :width => "36", :height => "36", :plugin => "redmine_nikoniko_calendar2" %></a>
+                    <span class="tip">
+                        <% if 0 < history.comment.length %>
+                        <%= h history.comment %>
+                        <% else %>
+                        (<%= l(:nikoniko_feel_no_comment)%>)
+                        <% end %>
+                    </span>
+                        <% end %>
+                </div>
+                    <% else %>
+                <%= image_tag "spacer.gif", :class => "niko", :width => "36", :height => "36", :alt => "", :plugin => "redmine_nikoniko_calendar2" %>
+                    <% end %>
+            </td>
+                <% end %>
+            <%
+            day = day + 1 
+            end
+            %>
+        </tr>
+        <% end %>
+    </tbody>
+</table>
