@@ -65,7 +65,7 @@ class NikonikoCalendarProjectController < ApplicationController
       binds[:role_ids] = role_ids
     end
 
-    @members = User.where([conditions, binds]).order(:id).joins(:members => [:project, :member_roles])
+    @members = User.where([conditions, binds]).order(:id).joins(:members => [:project, :member_roles]).uniq
     logger.debug("project_helo001");
     # get member's nikoniko
     @nikoniko_histories = {}
