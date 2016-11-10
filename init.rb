@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-Redmine::Plugin.register :redmine_nikoniko_calendar_by_4 do
+Redmine::Plugin.register :redmine_nikoniko_calendar2 do
   name 'Redmine Niko-niko Calendar2 plugin'
   author 'piccagliani'
   description 'Niko-niko Calendar plugin for Redmine 2.X'
